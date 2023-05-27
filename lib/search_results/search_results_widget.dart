@@ -2,6 +2,7 @@ import '/backend/api_requests/api_calls.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'dart:async';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -275,7 +276,7 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                                   padding: EdgeInsetsDirectional
                                                       .fromSTEB(
                                                           0.0, 10.0, 0.0, 0.0),
-                                                  child: Text(
+                                                  child: AutoSizeText(
                                                     (SearchVideosCall.titles(
                                                       listViewSearchVideosResponse
                                                           .jsonBody,
@@ -284,10 +285,10 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                                             (s) => s.toString())
                                                         .toList()[videosIndex]
                                                         .maybeHandleOverflow(
-                                                          maxChars: 80,
+                                                          maxChars: 32,
                                                           replacement: '…',
                                                         ),
-                                                    maxLines: 2,
+                                                    maxLines: 1,
                                                     style: FlutterFlowTheme.of(
                                                             context)
                                                         .bodyMedium,
@@ -305,11 +306,21 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                                       ) as List)
                                                           .map<String>((s) =>
                                                               s.toString())
-                                                          .toList()[videosIndex],
+                                                          .toList()[videosIndex]
+                                                          .maybeHandleOverflow(
+                                                              maxChars: 80),
+                                                      maxLines: 1,
                                                       style:
                                                           FlutterFlowTheme.of(
                                                                   context)
-                                                              .bodyMedium,
+                                                              .bodyMedium
+                                                              .override(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                color: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .secondaryText,
+                                                              ),
                                                     ),
                                                   ],
                                                 ),
