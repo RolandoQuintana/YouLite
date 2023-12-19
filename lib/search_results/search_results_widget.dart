@@ -1,10 +1,12 @@
 import '/backend/api_requests/api_calls.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'search_results_model.dart';
@@ -33,6 +35,7 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
     _model = createModel(context, () => SearchResultsModel());
 
     _model.textController ??= TextEditingController(text: widget.keyWord);
+    _model.textFieldFocusNode ??= FocusNode();
   }
 
   @override
@@ -44,6 +47,15 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
+
     context.watch<FFAppState>();
 
     return Scaffold(
@@ -71,7 +83,9 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                             width: 50.0,
                             height: 50.0,
                             child: CircularProgressIndicator(
-                              color: FlutterFlowTheme.of(context).primary,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                FlutterFlowTheme.of(context).primary,
+                              ),
                             ),
                           ),
                         );
@@ -79,6 +93,7 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                       final textFieldSearchVideosResponse = snapshot.data!;
                       return TextFormField(
                         controller: _model.textController,
+                        focusNode: _model.textFieldFocusNode,
                         onChanged: (_) => EasyDebounce.debounce(
                           '_model.textController',
                           Duration(milliseconds: 2000),
@@ -169,7 +184,9 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                       width: 50.0,
                       height: 50.0,
                       child: CircularProgressIndicator(
-                        color: FlutterFlowTheme.of(context).primary,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          FlutterFlowTheme.of(context).primary,
+                        ),
                       ),
                     ),
                   );
@@ -203,16 +220,18 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                               onTap: () async {
                                 if (true) {
                                   FFAppState().videoURLPath =
-                                      'https://www.youtube.com/watch?v=${(SearchVideosCall.videoId(
+                                      'https://www.youtube.com/watch?v=${((SearchVideosCall.videoId(
                                     listViewSearchVideosResponse.jsonBody,
-                                  ) as List).map<String>((s) => s.toString()).toList()[videosIndex].toString()}';
+                                  ) as List).map<String>((s) => s.toString()).toList()?[videosIndex])?.toString()}';
                                 }
 
                                 context.pushNamed(
                                   'PlayVideo',
-                                  queryParams: {
+                                  queryParameters: {
                                     'videoURLParam': serializeParam(
-                                      FFAppState().videoURL,
+                                      'https://www.youtube.com/watch?v=${((SearchVideosCall.videoId(
+                                        listViewSearchVideosResponse.jsonBody,
+                                      ) as List).map<String>((s) => s.toString()).toList()?[videosIndex])?.toString()}',
                                       ParamType.String,
                                     ),
                                   }.withoutNulls,
@@ -224,7 +243,7 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                   Image.network(
                                     SearchVideosCall.highThumbnails(
                                       listViewSearchVideosResponse.jsonBody,
-                                    )[videosIndex],
+                                    )![videosIndex],
                                     width: double.infinity,
                                     height: 200.0,
                                     fit: BoxFit.cover,
@@ -283,7 +302,7 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                                     ) as List)
                                                         .map<String>(
                                                             (s) => s.toString())
-                                                        .toList()[videosIndex]
+                                                        .toList()![videosIndex]
                                                         .maybeHandleOverflow(
                                                           maxChars: 32,
                                                           replacement: '…',
@@ -306,7 +325,8 @@ class _SearchResultsWidgetState extends State<SearchResultsWidget> {
                                                       ) as List)
                                                           .map<String>((s) =>
                                                               s.toString())
-                                                          .toList()[videosIndex]
+                                                          .toList()![
+                                                              videosIndex]
                                                           .maybeHandleOverflow(
                                                               maxChars: 80),
                                                       maxLines: 1,

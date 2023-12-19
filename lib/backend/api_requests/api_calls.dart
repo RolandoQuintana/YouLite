@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import '../../flutter_flow/flutter_flow_util.dart';
-
+import '/flutter_flow/flutter_flow_util.dart';
 import 'api_manager.dart';
 
 export 'api_manager.dart' show ApiCallResponse;
@@ -12,7 +11,7 @@ const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 class SearchVideosCall {
   static Future<ApiCallResponse> call({
     String? keyWord = '',
-  }) {
+  }) async {
     return ApiManager.instance.makeApiCall(
       callName: 'SearchVideos',
       apiUrl: 'https://www.googleapis.com/youtube/v3/search',
@@ -28,44 +27,53 @@ class SearchVideosCall {
       encodeBodyUtf8: false,
       decodeUtf8: false,
       cache: false,
+      alwaysAllowBody: false,
     );
   }
 
-  static dynamic itemVideos(dynamic response) => getJsonField(
+  static List? itemVideos(dynamic response) => getJsonField(
         response,
         r'''$.items''',
         true,
-      );
-  static dynamic itemSnippets(dynamic response) => getJsonField(
+      ) as List?;
+  static List? itemSnippets(dynamic response) => getJsonField(
         response,
         r'''$.items[:].snippet''',
         true,
-      );
-  static dynamic titles(dynamic response) => getJsonField(
+      ) as List?;
+  static List<String>? titles(dynamic response) => (getJsonField(
         response,
         r'''$.items[:].snippet.title''',
         true,
-      );
-  static dynamic thumbnails(dynamic response) => getJsonField(
+      ) as List?)
+          ?.withoutNulls
+          .cast<String>();
+  static List<String>? thumbnails(dynamic response) => (getJsonField(
         response,
         r'''$.items[:].snippet.thumbnails.default.url''',
         true,
-      );
-  static dynamic highThumbnails(dynamic response) => getJsonField(
+      ) as List?)
+          ?.withoutNulls
+          .cast<String>();
+  static List<String>? highThumbnails(dynamic response) => (getJsonField(
         response,
         r'''$.items[:].snippet.thumbnails.high.url''',
         true,
-      );
-  static dynamic channelTitle(dynamic response) => getJsonField(
+      ) as List?)
+          ?.withoutNulls
+          .cast<String>();
+  static List<String>? channelTitle(dynamic response) => (getJsonField(
         response,
         r'''$.items[:].snippet.channelTitle''',
         true,
-      );
-  static dynamic videoId(dynamic response) => getJsonField(
+      ) as List?)
+          ?.withoutNulls
+          .cast<String>();
+  static List? videoId(dynamic response) => getJsonField(
         response,
         r'''$.items[:].id.videoId''',
         true,
-      );
+      ) as List?;
 }
 
 class ApiPagingParams {
@@ -93,11 +101,11 @@ String _serializeList(List? list) {
   }
 }
 
-String _serializeJson(dynamic jsonVar) {
-  jsonVar ??= {};
+String _serializeJson(dynamic jsonVar, [bool isList = false]) {
+  jsonVar ??= (isList ? [] : {});
   try {
     return json.encode(jsonVar);
   } catch (_) {
-    return '{}';
+    return isList ? '[]' : '{}';
   }
 }

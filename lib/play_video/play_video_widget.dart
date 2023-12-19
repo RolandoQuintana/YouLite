@@ -1,7 +1,9 @@
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_youtube_player.dart';
+import '/flutter_flow/flutter_flow_video_player.dart';
+import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'play_video_model.dart';
@@ -23,7 +25,6 @@ class _PlayVideoWidgetState extends State<PlayVideoWidget> {
   late PlayVideoModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final _unfocusNode = FocusNode();
 
   @override
   void initState() {
@@ -35,38 +36,44 @@ class _PlayVideoWidgetState extends State<PlayVideoWidget> {
   void dispose() {
     _model.dispose();
 
-    _unfocusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isiOS) {
+      SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+          statusBarBrightness: Theme.of(context).brightness,
+          systemStatusBarContrastEnforced: true,
+        ),
+      );
+    }
+
     context.watch<FFAppState>();
 
-    return YoutubeFullScreenWrapper(
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(_unfocusNode),
-        child: Scaffold(
-          key: scaffoldKey,
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          body: SafeArea(
-            top: true,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Flexible(
-                  child: FlutterFlowYoutubePlayer(
-                    url: FFAppState().videoURLPath,
-                    autoPlay: false,
-                    looping: true,
-                    mute: false,
-                    showControls: true,
-                    showFullScreen: true,
-                    pauseOnNavigate: false,
-                  ),
-                ),
-              ],
-            ),
+    return GestureDetector(
+      onTap: () => _model.unfocusNode.canRequestFocus
+          ? FocusScope.of(context).requestFocus(_model.unfocusNode)
+          : FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        body: SafeArea(
+          top: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              FlutterFlowVideoPlayer(
+                path: FFAppState().videoURLPath,
+                videoType: VideoType.network,
+                autoPlay: false,
+                looping: true,
+                showControls: true,
+                allowFullScreen: true,
+                allowPlaybackSpeedMenu: false,
+              ),
+            ],
           ),
         ),
       ),
